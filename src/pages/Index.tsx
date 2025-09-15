@@ -1,17 +1,51 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { CategoryMenu } from "@/components/CategoryMenu";
 import { ArticleCard } from "@/components/ArticleCard";
 import { FloatingSearchButton } from "@/components/FloatingSearchButton";
-import { mockArticles } from "@/data/articles";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { mockArticles, generateMoreArticles } from "@/data/articles";
+import type { Article } from "@/components/ArticleCard";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [articles, setArticles] = useState<Article[]>(mockArticles);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
 
   const filteredArticles = selectedCategory 
-    ? mockArticles.filter(article => article.category === selectedCategory)
-    : mockArticles;
+    ? articles.filter(article => article.category === selectedCategory)
+    : articles;
+
+  const loadMoreArticles = useCallback(async () => {
+    if (isLoading || !hasMore) return;
+    
+    setIsLoading(true);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    const newArticles = generateMoreArticles(articles.length + 1, 6);
+    setArticles(prev => [...prev, ...newArticles]);
+    setPage(prev => prev + 1);
+    
+    // Stop loading more after 5 pages (30 articles total)
+    if (page >= 5) {
+      setHasMore(false);
+    }
+    
+    setIsLoading(false);
+  }, [articles.length, isLoading, hasMore, page]);
+
+  const { loadingRef } = useInfiniteScroll({
+    hasMore,
+    isLoading,
+    onLoadMore: loadMoreArticles,
+    threshold: 200
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -50,14 +84,27 @@ const Index = () => {
               />
             ))}
           </div>
+          
+          {/* Infinite Scroll Trigger */}
+          <div ref={loadingRef} className="h-4" />
+          
+          {/* Loading Indicator */}
+          {isLoading && (
+            <LoadingSpinner text="Загружаем ещё новости..." />
+          )}
+          
+          {/* End of Content Message */}
+          {!hasMore && !isLoading && (
+            <div className="text-center py-8">
+              <div className="text-muted-foreground text-sm">
+                🎉 Вы просмотрели все новости!
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Проверьте позже, возможно появятся новые материалы
+              </div>
+            </div>
+          )}
         </section>
-
-        {/* Load More */}
-        <div className="p-4 pb-24 text-center">
-          <button className="px-6 py-3 bg-secondary text-secondary-foreground rounded-full font-medium transition-smooth hover:bg-accent">
-            Загрузить ещё
-          </button>
-        </div>
       </main>
 
       <FloatingSearchButton />

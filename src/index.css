@@ -129,6 +129,8 @@ All colors MUST be HSL for proper theming.
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Enable smooth scrolling for better infinite scroll experience */
+    overflow-x: hidden;
   }
 
   /* Smooth scrolling for mobile */
@@ -136,6 +138,8 @@ All colors MUST be HSL for proper theming.
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Optimize scrolling performance */
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Custom utilities */
