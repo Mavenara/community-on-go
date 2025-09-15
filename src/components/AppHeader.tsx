@@ -1,7 +1,11 @@
-import { Search, Bell, User } from "lucide-react";
+import { Bell, User, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export const AppHeader = () => {
+interface AppHeaderProps {
+  onMenuClick: () => void;
+}
+
+export const AppHeader = ({ onMenuClick }: AppHeaderProps) => {
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="flex items-center justify-between p-4">
@@ -18,8 +22,8 @@ export const AppHeader = () => {
         </div>
         
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="relative">
-            <Search size={20} />
+          <Button variant="ghost" size="icon" onClick={onMenuClick}>
+            <Menu size={20} />
           </Button>
           <Button variant="ghost" size="icon" className="relative">
             <Bell size={20} />

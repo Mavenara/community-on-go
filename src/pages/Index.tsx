@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { AppHeader } from "@/components/AppHeader";
-import { CategoryFilter } from "@/components/CategoryFilter";
+import { CategoryMenu } from "@/components/CategoryMenu";
 import { ArticleCard } from "@/components/ArticleCard";
+import { FloatingSearchButton } from "@/components/FloatingSearchButton";
 import { mockArticles } from "@/data/articles";
 
 const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const filteredArticles = selectedCategory 
     ? mockArticles.filter(article => article.category === selectedCategory)
@@ -13,7 +15,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader />
+      <AppHeader onMenuClick={() => setIsMenuOpen(true)} />
+      
+      <CategoryMenu 
+        isOpen={isMenuOpen}
+        onClose={() => setIsMenuOpen(false)}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+      />
       
       <main className="pb-safe">
         {/* Hero Section */}
@@ -30,16 +39,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Category Filter */}
-        <section className="py-4 bg-background sticky top-16 z-40 border-b border-border">
-          <CategoryFilter 
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-        </section>
-
         {/* Articles Grid */}
-        <section className="p-4">
+        <section className="p-4 pb-24">
           <div className="grid gap-4 max-w-md mx-auto">
             {filteredArticles.map((article) => (
               <ArticleCard 
@@ -52,12 +53,14 @@ const Index = () => {
         </section>
 
         {/* Load More */}
-        <div className="p-4 text-center">
+        <div className="p-4 pb-24 text-center">
           <button className="px-6 py-3 bg-secondary text-secondary-foreground rounded-full font-medium transition-smooth hover:bg-accent">
             Загрузить ещё
           </button>
         </div>
       </main>
+
+      <FloatingSearchButton />
     </div>
   );
 };
